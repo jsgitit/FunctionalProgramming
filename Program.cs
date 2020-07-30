@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace FunctionalProgramming
@@ -8,12 +9,18 @@ namespace FunctionalProgramming
     {
         private static void Main(string[] args)
         {
-            // var numbers = new[] { 3, 5, 7, 9, 11, 13 };
-            // using GetLazyRandomNumber() now for a stream of numbers
-            foreach (var prime in GetLazyRandomNumber(100).Find(IsPrime).Take(2))
+            var timekeeper = new Timekeeper();  // will allow us to measure how long an action takes to run
+
+            var elapsed = timekeeper.Measure(() =>
             {
-                Console.WriteLine("Prime number found: {0}", prime);
-            }
+                // var numbers = new[] { 3, 5, 7, 9, 11, 13 };
+                // using GetLazyRandomNumber() now for a stream of numbers
+                foreach (var prime in GetLazyRandomNumber(100).Find(IsPrime).Take(2))
+                {
+                    Console.WriteLine("Prime number found: {0}", prime);
+                }
+            });
+            Console.WriteLine("The elapsed time was {0}", elapsed);
         }
 
         private static IEnumerable<int> GetLazyRandomNumber(int max)
@@ -54,6 +61,19 @@ namespace FunctionalProgramming
                 }
             }
             return result;
+        }
+
+        public class Timekeeper
+        {
+            // Measure() takes a "Action" as a parameter and measures the 
+            // elapsed time to run the function.
+            public TimeSpan Measure(Action action)
+            {
+                var watch = new Stopwatch();
+                watch.Start();
+                action();
+                return watch.Elapsed;
+            }
         }
     }
 }
