@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Runtime.InteropServices;
 
 namespace FunctionalProgramming
 {
@@ -24,7 +22,22 @@ namespace FunctionalProgramming
                 }
             });
             Console.WriteLine("The elapsed time was {0}", elapsed);
-       }
+            Console.ReadLine();
+            // Partial example
+
+            var client = new WebClient();
+            Func<string, string> download = url => client.DownloadString(url);
+            
+            var data = download.Partial("https://api.tlopo.com/system/status/").WithRetry();
+            Console.WriteLine("Using Partial function with retry returns the following string: \nn" + data);
+            Console.ReadLine();
+            // Curry example
+            // build a Func of string that returns a func of string
+            Func<string, Func<string>> downloadCurry = download.Curry();
+            var data2 = downloadCurry("https://api.tlopo.com/system/status/").WithRetry();
+            Console.WriteLine("Using Curry function with retry returns the following string: \n\n" + data2);
+            
+        }
 
         private static IEnumerable<int> GetLazyRandomNumber(int max)
         {
@@ -79,10 +92,6 @@ namespace FunctionalProgramming
             }
         }
 
-        public class GetData
-        {
-           
-            
-        }
+
     }
 }
