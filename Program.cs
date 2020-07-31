@@ -54,14 +54,12 @@ namespace FunctionalProgramming
                 foreach (var number in prev.Result)
                 {
                     Console.WriteLine("The number found was {0}", number);
-
                 }
             });
             task.Start();
             Console.WriteLine("Doing some other work right now");
 
             task2.Wait(); 
-
         }
 
         private static IList<int> FindLargePrimes(int start, int end)
