@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace FunctionalProgramming
 {
@@ -10,7 +11,7 @@ namespace FunctionalProgramming
     {
         private static void Main(string[] args)
         {
-            var timekeeper = new Timekeeper();  // will allow us to measure how long an action takes to run
+            var timekeeper = new Timekeeper();  // Timekeeper allows us to measure how long an action takes to run
 
             var elapsed = timekeeper.Measure(() =>
             {
@@ -27,7 +28,7 @@ namespace FunctionalProgramming
 
             var client = new WebClient();
             Func<string, string> download = url => client.DownloadString(url);
-            
+
             var data = download.Partial("https://api.tlopo.com/system/status/").WithRetry();
             Console.WriteLine("Using Partial function with retry returns the following string: \nn" + data);
             Console.ReadLine();
@@ -36,7 +37,42 @@ namespace FunctionalProgramming
             Func<string, Func<string>> downloadCurry = download.Curry();
             var data2 = downloadCurry("https://api.tlopo.com/system/status/").WithRetry();
             Console.WriteLine("Using Curry function with retry returns the following string: \n\n" + data2);
-            
+
+            // Now let's use TPL Async and Task in functional programming.
+
+            elapsed = timekeeper.Measure(() => FindLargePrimes(900000, 1000000));
+            Console.WriteLine("Finding all prime numbers took: {0}", elapsed);
+
+            // now use Async()
+            elapsed = timekeeper.Measure(() => FindLargePrimesAsynch(900000, 1000000));
+            Console.WriteLine("Finding all prime numbers in parallel took: {0}", elapsed);
+
+            // now use Task
+            var task = new Task<IEnumerable<int>>(() => FindLargePrimes(3, 100));
+            var task2 = task.ContinueWith((prev) =>
+            {
+                foreach (var number in prev.Result)
+                {
+                    Console.WriteLine("The number found was {0}", number);
+
+                }
+            });
+            task.Start();
+            Console.WriteLine("Doing some other work right now");
+
+            task2.Wait(); 
+
+        }
+
+        private static IList<int> FindLargePrimes(int start, int end)
+        {
+            var primes = Enumerable.Range(start, end - start).ToList();
+            return primes.Where(IsPrime).ToList();
+        }
+        private static IList<int> FindLargePrimesAsynch(int start, int end)
+        {
+            var primes = Enumerable.Range(start, end - start).ToList();
+            return primes.AsParallel().Where(IsPrime).ToList();
         }
 
         private static IEnumerable<int> GetLazyRandomNumber(int max)
