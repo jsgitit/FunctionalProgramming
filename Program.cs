@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
+using System.Runtime.InteropServices;
 
 namespace FunctionalProgramming
 {
@@ -21,7 +24,7 @@ namespace FunctionalProgramming
                 }
             });
             Console.WriteLine("The elapsed time was {0}", elapsed);
-        }
+       }
 
         private static IEnumerable<int> GetLazyRandomNumber(int max)
         {
@@ -74,6 +77,12 @@ namespace FunctionalProgramming
                 action();
                 return watch.Elapsed;
             }
+        }
+
+        public class GetData
+        {
+           
+            
         }
     }
 }
